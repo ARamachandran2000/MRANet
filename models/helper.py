@@ -8,7 +8,6 @@ import numpy as np
 from collections import namedtuple
 import time
 import tensorflow as tf
-# tf.disable_v2_behavior()
 from urllib.request import urlretrieve
 from tqdm import tqdm
 import os.path
@@ -21,9 +20,7 @@ import cv2
 # Assuming RGB Format
 
 Label = namedtuple('Label', ['name', 'color'])
-# label_classes = [
-# 	Label('car', (0,  0,142)),
-# 	Label('person', (220, 20, 60))]
+
 label_classes = [
     Label('unlabelled', (0, 0, 0)),
     Label('undamaged', (0, 255, 0)),
@@ -56,7 +53,7 @@ def gen_batches_fn(img_shape, image_paths, label_paths):
         print(image_files)
 
         gt_images, train_images = [], []
-        for img in image_files:  # [0:79]
+        for img in image_files: 
             img_base = os.path.basename(img)
             img_city = os.path.basename(os.path.dirname(img))
             label_base = img_base

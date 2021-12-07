@@ -1,4 +1,5 @@
 import numpy as np
+import cv2
 
 EPS = 1e-12
 
@@ -76,25 +77,6 @@ def recall(gt, pr, n_classes):
 
     return class_wise_recall
 
-
-
-# Tests
-# gt = np.zeros((60,60), dtype=np.int8)
-# gt[:,:20] = 0
-# gt[:,20:40] = 1
-# gt[:,40:60] = 2
-
-# pr = np.zeros((60,60), dtype=np.int8)
-# pr[:,:10] = 0
-# pr[:,10:30] = 1
-# pr[:,30:60] = 2
-
-# print(get_iou_dice(gt, pr, 3))
-# print(get_pixel_accuracy(gt, pr, 3)*100)
-# print(precision(gt, pr, 3))
-# print(recall(gt, pr, 3))
-
-import cv2
 
 gt_file = './gt/Final_Labels_Final_2/'
 pred_file = './pred_vggnet/'

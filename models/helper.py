@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from collections import namedtuple
 import time
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
 from urllib.request import urlretrieve
 from tqdm import tqdm
 import os.path
@@ -17,10 +18,9 @@ import cv2
 
 
 
-# Assuming RGB Format
-
 Label = namedtuple('Label', ['name', 'color'])
 
+# List of tuples containing different class labels and the color associated
 label_classes = [
     Label('unlabelled', (0, 0, 0)),
     Label('undamaged', (0, 255, 0)),
@@ -29,31 +29,35 @@ label_classes = [
 
 ]
 
-
 def load_data(image_paths, label_paths):
+    '''
+    Returns list of paths of image and label files
+    '''
     image_files = glob(image_paths +  '*.png')
     label_files = glob(label_paths + '*.png')
 
     gt_images = []
     for img in image_files:
         img_base = os.path.basename(img)
-        label_base = img_base
+        label_base = img_bases
         label = label_paths + label_base
 
         gt_images.append(label)
 
     return image_files, gt_images
 
-
 def gen_batches_fn(img_shape, image_paths, label_paths):
     def get_batches_fn(batch_size):
+        '''
+        The function creates batches of required size for training
+        '''
 
         image_files = glob(image_paths + '*.png')
         label_files = glob(label_paths + '*.png')
         print(image_files)
 
         gt_images, train_images = [], []
-        for img in image_files: 
+        for img in image_files:  # [0:79]
             img_base = os.path.basename(img)
             img_city = os.path.basename(os.path.dirname(img))
             label_base = img_base
@@ -104,7 +108,6 @@ def gen_batches_fn(img_shape, image_paths, label_paths):
 
     return get_batches_fn
 
-
 def gen_test_output(sess, logits, keep_prob, image_pl, image_test, gt_test, image_shape, label_colors):
     for f in image_test:
         image_file = f
@@ -134,7 +137,6 @@ def gen_test_output(sess, logits, keep_prob, image_pl, image_test, gt_test, imag
 
         yield os.path.basename(image_file), np.array(mask)
 
-
 def save_inference_samples(runs_dir, image_test, gt_test, sess, image_shape, logits, keep_prob, input_image,
                            label_colors):
     # Make folder for current run
@@ -151,7 +153,6 @@ def save_inference_samples(runs_dir, image_test, gt_test, sess, image_shape, log
         print(name)
         scipy.misc.imsave(os.path.join(output_dir, name), image)
 
-
 class DLProgress(tqdm):
     last_block = 0
 
@@ -159,7 +160,6 @@ class DLProgress(tqdm):
         self.total = total_size
         self.update((block_num - self.last_block) * block_size)
         self.last_block = block_num
-
 
 def maybe_download_pretrained_vgg(data_dir):
     """

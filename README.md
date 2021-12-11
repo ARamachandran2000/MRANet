@@ -83,124 +83,102 @@ Semantic Segmentation of remotely sensed images for post disaster assessment
 
 
 
+## Project Organization
+-------
+    ├── README.md          
+    ├── models
+    │   ├── main.py
+    │   ├── helper.py
+    ├── utils
+    │   └── metrics.py
+    │
+    ├── requirements.txt   <- The requirements file for reproducing the analysis environment,
+    │                         generated with `pip freeze > requirements.txt`
+    ├── saved_models                  
+    │   ├── checkpoint
+    │   ├── model_latest.ckpt.data-00000-of-00001
+    │   ├── model_latest.ckpt.index
+    │   └── model_latest.ckpt.meta
+    └── data                <- Source code for use in this project.
+        ├── vgg
+        │   ├── variables
+        │   ├── make_dataset.py  <- Script to generate data
+                └── ....
+        
+
+
+
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+-------
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+This repository is team VB210282's submission to the IITB Techfest Vision Beyond Limits(VBL) Competition.
 
-There are many great README templates available on GitHub; however, I didn't find one that really suited my needs so I created this enhanced one. I want to create a README template so amazing that it'll be the last one you ever need -- I think this is it.
+Segmentation of remotely sensed images lies at the intersection of the domains of remote sensing and computer vision. It is used to systematically extract information from data collected by various airborne and space-borne sensors, resulting in a simpler representation. This method is used in various applications which include change detection, land cover and land use classification, resource exploration, the study of natural hazards, and mapping. In this work, we will focus on the study of natural hazards, i.e., building a multi-class semantic segmentation model that categories the given post-disaster (earthquakes in particular) imagery based on damage. 
 
-Here's why:
-* Your time should be focused on creating something amazing. A project that solves a problem and helps others
-* You shouldn't be doing the same tasks over and over like creating a README from scratch
-* You should implement DRY principles to the rest of your life :smile:
+The model is trained on the Xview2 building damage assessment dataset as provided by the IIT-B VBL team.
 
-Of course, no one template will serve all projects since your needs may be different. So I'll be adding more in the near future. You may also suggest changes by forking this repo and creating a pull request or opening an issue. Thanks to all the people have contributed to expanding this template!
+# Network
+-------
 
-Use the `BLANK_README.md` to get started.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+For the given task we propose to go with the traditional U-Net architecture composed with an MRA (Multi-Resolution Analysis ) framework. The U-Net architecture is a simple encoder-decoder fully convolutional pipeline consisting of contracting (encoder) and expanding/extracting (decoder) paths. 
+The MRA framework is interspersed into the U-Net Architecture in such a way that it pre-processes the inputs to the network at several stages to increase the contextual overview of the network as the same data on multiple scales is available for feature extraction and learning. 
 
 
+## Why MRA? 
+-------
 
-### Built With
-
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
+The intuition behind using multi-resolution analysis is that images contain features at different scales important for segmentation, therefore, a multi-resolution analysis (MRA) approach is useful for their extraction since this decomposition allows us to even segment structures of various dimensions and structures with ease.
 
 
+## Network Architecture
+-------
 
-<!-- GETTING STARTED -->
-## Getting Started
+<p align="center">
+  <img src="assets/network_architecture.png" width="550" height="750" title="network">
+</p>
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+## Loss Function
+-------
 
-### Prerequisites
+Categorical cross-entropy was used as the loss function
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+<p align="center">
+  <img src="assets/loss.png" width="350" height="100" title="loss">
+</p>
 
-### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+### Setup
+-------
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Install the [virtualenv tool](https://pypi.org/project/virtualenv-tools/)
+2. Create env
+   ```
+    python -m venv <env-name>
+   ```
+3. Activate env
    ```sh
-   git clone https://github.com/your_username_/Project-Name.git
+   source <env-name>/bin/activate
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
+4. ```sh
+   pip install -r requirements.txt
    ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+## Run
+-------
 
-<!-- USAGE EXAMPLES -->
-## Usage
+```
+python --input "<path to image>" test.py
+```
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+## Results
 
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [x] Add Changelog
-- [x] Add back to top links
-- [ ] Add Additional Templates w/ Examples
-- [ ] Add "components" document to easily copy & paste sections of the readme
-- [ ] Multi-language Support
-    - [ ] Chinese
-    - [ ] Spanish
-
-See the [open issues](https://github.com/othneildrew/Best-README-Template/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
+<p align="center">
+  <img src="assets/results.png" width="800" height="350" title="loss">
+</p>
 
 <!-- LICENSE -->
 ## License

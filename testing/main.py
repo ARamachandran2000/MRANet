@@ -250,7 +250,7 @@ def pred(image_path):
                                label_colors)
 
         # Load sample image and create dummy image
-        sample_image_dir = 'tests/test.png'
+        sample_image_dir = 'sample_img.png'
         image = cv2.imread(sample_image_dir)
         img = np.zeros_like(image)
 

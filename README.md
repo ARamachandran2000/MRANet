@@ -153,6 +153,13 @@ python --input "<path to image>" main.py
   <img src="assets/results.png" width="800" height="350" title="loss">
 </p>
 
+meanIOU:       88.17% <br>
+meanDice:      92.55% <br>
+pixelAccuracy: 89.9% <br>
+Precision:     90.27% <br>
+Recall:        92.98% <br>
+
+
 <!-- LICENSE -->
 ## License
 

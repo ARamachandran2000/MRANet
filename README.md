@@ -131,7 +131,11 @@ Please Download the Xview2 Earthquake disaster Dataset and save the Images and L
 5. Loading data <br>( Download data.zip from the [here](https://drive.google.com/drive/u/1/folders/1rNZOSgXUMRIO5JUhLPWkwlid3cD-irot) and extract in home folder )
 6. Saved Models <br>
    To test the model download saved_models.zip from [here](https://drive.google.com/drive/u/1/folders/1rNZOSgXUMRIO5JUhLPWkwlid3cD-irot) and extract in home folder
-
+7. Installing wavetf <br>
+    ```sh
+       cd wavetf
+       pip3 install .
+   ```
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 

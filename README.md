@@ -33,7 +33,7 @@ Semantic Segmentation of remotely sensed images for post disaster assessment
 -------
     ├── README.md       
     │   
-    ├── training                <- raining codes
+    ├── training                <- training codes
     │   ├── main.py
     │   ├── helper.py
     │   └── MRA_Model.py

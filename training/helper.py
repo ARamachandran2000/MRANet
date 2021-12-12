@@ -39,7 +39,7 @@ def load_data(image_paths, label_paths):
     gt_images = []
     for img in image_files:
         img_base = os.path.basename(img)
-        label_base = img_bases
+        label_base = img_base
         label = label_paths + label_base
 
         gt_images.append(label)
@@ -57,10 +57,11 @@ def gen_batches_fn(img_shape, image_paths, label_paths):
         print(image_files)
 
         gt_images, train_images = [], []
-        for img in image_files:  # [0:79]
+        for img in image_files:
             img_base = os.path.basename(img)
             img_city = os.path.basename(os.path.dirname(img))
             label_base = img_base
+
             # Changing the last term in the training images to the label base because they have the same name up to that point.
             label = label_paths + label_base
 
@@ -75,27 +76,23 @@ def gen_batches_fn(img_shape, image_paths, label_paths):
 
             for img, label in zip(train_image_paths[batch_i:batch_i + batch_size],
                                   gt_image_paths[batch_i:batch_i + batch_size]):
-                # print(img, label)
+                
                 image = scipy.misc.imresize(scipy.misc.imread(img), img_shape)
-                #cv2.imwrite("/content/inp.png",image)
+
                 gt_image = scipy.misc.imresize(scipy.misc.imread(label, mode='RGB'), img_shape)
-                #cv2.imwrite("/content/gt.png",gt_image)
+
                 label_bg = np.zeros([img_shape[0], img_shape[1]], dtype=bool)
-                # plt.imshow(image)
-                # plt.show()
-                # plt.imshow(gt_image)
-                # plt.show()
+
                 label_list = []
                 for l in label_classes[1:]:
                     current_class = np.all(gt_image == np.array(l.color), axis=2)
                     label_bg = current_class | label_bg
                     label_list.append(current_class)
-                # plt.imshow(label_bg)
-                # plt.show()
 
                 # ~ changes 0 to 1 and 1 to 0 so we find everything else not considered a class and stack this
                 # onto the label_list.
                 label_bg = ~label_bg
+
                 # Now we stack labels depth wise. For example, 2 classes would result in a shape (256, 512, 3) where
                 # each depth slice (pixel) might look like [False, False, True] or [0, 0, 1].
                 label_all = np.dstack([label_bg, *label_list])
@@ -130,10 +127,6 @@ def gen_test_output(sess, logits, keep_prob, image_pl, image_test, gt_test, imag
             labels_colored[label_mask] = np.array([*label_colors[lab],255])
 
         mask = scipy.misc.toimage(labels_colored, mode="RGBA")
-        #print(labels_colored.shape)
-        #cv2.imwrite("check.png",labels_colored)
-#         init_img = scipy.misc.toimage(image)
-#         init_img.paste(mask, box=None, mask=mask)
 
         yield os.path.basename(image_file), np.array(mask)
 
@@ -146,7 +139,7 @@ def save_inference_samples(runs_dir, image_test, gt_test, sess, image_shape, log
     os.makedirs(output_dir)
 
     # Run NN on test images and save them to HD
-    print('Training Finished. Saving test images to: {}'.format(output_dir))
+    print('Saving test images to: {}'.format(output_dir))
     image_outputs = gen_test_output(sess, logits, keep_prob, input_image, image_test, gt_test, image_shape,
                                     label_colors)
     for name, image in image_outputs:

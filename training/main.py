@@ -1,9 +1,12 @@
-from helper import *
 import tensorflow.compat.v1 as tf
 tf.disable_v2_behavior()
+
+from helper import *
+
 import time
-import numpy as np
 import cv2
+import numpy as np
+
 from MRA_Model import *
 
 ## Global variables ##
@@ -25,10 +28,6 @@ def load_vgg(sess, vgg_path):
     layer3_out = graph.get_tensor_by_name('layer3_out:0')
     layer4_out = graph.get_tensor_by_name('layer4_out:0')
     layer7_out = graph.get_tensor_by_name('layer7_out:0')
-
-    # To find and print tensor names:
-    # for op in graph.get_operations():
-    # 	print(str(op.name))
 
     return input_image, keep_prob, layer3_out, layer4_out, layer7_out
 
@@ -158,10 +157,6 @@ def create_model():
     dec_9 = layers.Conv2D(4, kernel_size=(3, 3), padding="same", kernel_initializer=tf.random_normal_initializer(stddev=0.01))(dec_8)
     dec_9 = create_activation()(dec_9)
     final_output = layers.Conv2D(4 , kernel_size=(3, 3), padding="same", kernel_initializer=tf.random_normal_initializer(stddev=0.01))(dec_9)
-    #final_output = sigmoid_activation()(final_output)
-
-
-    #model = models.Model(input_1,final_output)
 
     return input_1,final_output
 
@@ -177,7 +172,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 
     # logits and labels are now 2D tensors where each row represents a pixel and each column a class
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
-    print(logits.shape)
+
     correct_label = tf.reshape(correct_label, (-1, num_classes))
 
     # Computes softmax cross entropy between logits and labels
@@ -208,7 +203,6 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
     :param keep_prob: TF Placeholder for dropout keep probability
     :param learning_rate: TF Placeholder for learning rate
     """
-    # TODO: Implement function
 
     total_loss = []
     for epoch in range(epochs):
@@ -235,7 +229,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
             saver.save(sess, save_file)
 
     end_time = time.time() - start_time
-    print('Done')
+    return total_loss
 
 def run():
     '''
@@ -247,25 +241,28 @@ def run():
     data_folder = '../dataset/'
     image_paths = data_folder + 'Final_Images_Final/'
     label_paths = data_folder + 'Final_Labels_Final_2/'
+
     vgg_path = '../data/vgg/'
+    maybe_download_pretrained_vgg('../data')
+
     runs_dir = './runs_city'
+
     label_colors = {i: np.array(l.color) for i, l in enumerate(label_classes)}
     print("Labels = ",label_colors)
-    maybe_download_pretrained_vgg('../data')
-    # train_image_paths, gt_image_paths = load_data(image_paths, label_paths, data_type='train')
 
     # Training Paramaters
     batch_size = 1
     img_shape = (128, 128)
     num_classes = 4
     learning_rate = 1e-4
-    epochs = 51  #Change this
+    epochs = 51
 
     with tf.Session() as sess:
         ## Construct Network ##
-        _, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
-        #deconv_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
-        input_1,deconv_output = create_model()
+        _, keep_prob, _, _, _ = load_vgg(sess, vgg_path)
+
+        input_1, deconv_output = create_model()
+
         # placeholder for labels, shape=(128, 256, 512, 30). X placeholder is input_image found above.
         correct_label = tf.placeholder(tf.float32, [None, None, None, num_classes], name='correct_label')
         learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
@@ -276,94 +273,19 @@ def run():
         # Initialize variables
         sess.run(tf.global_variables_initializer())
 
+        # Training Block
         print("Starting Training...")
         get_batches_fn = gen_batches_fn(img_shape, image_paths, label_paths)
 
-        train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_1, correct_label,
+        history = train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_loss, input_1, correct_label,
                  keep_prob, learning_rate)
-        
-        save_file = './model1.ckpt'
-        saver = tf.train.Saver()
-        saver.save(sess, save_file)
+        print("Done Training...")
 
         ### Testing ###
         image_test, gt_test = load_data(image_paths, label_paths)
-        data_dir = data_folder + 'Final_Images_Final/' + '*.png'
-        print("Here")
-        # save_inference_samples(runs_dir, data_dir, sess, img_shape, logits, keep_prob, input_image, label_colors)
-        save_inference_samples(runs_dir, image_test, gt_test, sess, img_shape, logits, keep_prob, input_1,
-                               label_colors)
-
-def continue_training():
-    # Loads Data from checkpoint and continues training , Also used to run inference
-    data_folder = '../dataset/'
-    image_paths = data_folder + 'Final_Images_Final/'
-    label_paths = data_folder + 'Final_Labels_Final_2/'
-    vgg_path = '../data/vgg/'
-    runs_dir = './runs_city'
-    label_colors = {i: np.array(l.color) for i, l in enumerate(label_classes)}
-
-    # Training Paramaters
-    batch_size = 4
-    img_shape = (128, 128)
-    num_classes = 4
-    learning_rate = 1e-4
-    epochs = 4
-
-    with tf.Session() as sess:
-
-        ## Construct Network ##
-        _, keep_prob, layer3_out, layer4_out, layer7_out = load_vgg(sess, vgg_path)
-        #deconv_output = layers(layer3_out, layer4_out, layer7_out, num_classes)
-        input_1,deconv_output = create_model()
-        # placeholder for labels, shape=(128, 256, 512, 30). X placeholder is input_image found above.
-        correct_label = tf.placeholder(tf.float32, [None, None, None, num_classes], name='correct_label')
-        learning_rate = tf.placeholder(dtype=tf.float32, name='learning_rate')
-
-        ## Optimize Network ##
-        logits, train_op, cross_entropy_loss = optimize(deconv_output, correct_label, learning_rate, num_classes)
-
-        # Initialize variables
-        sess.run(tf.global_variables_initializer())
-
-#         get_batches_fn = gen_batches_fn(img_shape, image_paths, label_paths, data_type='train')
-
-        saver = tf.train.Saver()
-        saver.restore(sess, tf.train.latest_checkpoint('./saved_models/'))
-        graph = tf.get_default_graph()
-
-#         for epoch in range(epochs):
-
-#             total_loss = []
-#             start_time = time.time()
-#             loss = None
-#             batch_num = 0
-#             for image, label in get_batches_fn(batch_size):
-#                 _, loss = sess.run(
-#                     [train_op, cross_entropy_loss],
-#                     feed_dict={input_image: image,
-#                                correct_label: label,
-#                                keep_prob: KEEP_PROB,
-#                                learning_rate: LEARNING_RATE})
-#                 batch_num += 1
-#                 total_loss.append(loss)
-#                 print("Batch {0} Loss {1} Avg.loss {2} Time {3}".format(batch_num, loss, np.mean(total_loss),
-#                                                                         time.time() - start_time))
-
-#             print("[Epoch: {0}/{1} Loss: {2} Time: {3}]".format(epoch + 1, epochs, np.mean(total_loss),
-#                                                                       time.time() - start_time))
-
-#         save_file = './model10.ckpt'
-#         saver = tf.train.Saver()
-#         saver.save(sess, save_file)
-
-        ### Testing ###
-        image_test, gt_test = load_data(image_paths, label_paths)
-        data_dir = data_folder + 'Final_Images/' + '*.png'
         save_inference_samples(runs_dir, image_test, gt_test, sess, img_shape, logits, keep_prob, input_1,
                                label_colors)
 
 # Main Block
 if __name__ == '__main__':
-#     run()
-    continue_training()
+    run()

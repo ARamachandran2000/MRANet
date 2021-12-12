@@ -129,10 +129,7 @@ def create_model():
     dec_9 = layers.Conv2D(4, kernel_size=(3, 3), padding="same", kernel_initializer=tf.random_normal_initializer(stddev=0.01))(dec_8)
     dec_9 = create_activation()(dec_9)
     final_output = layers.Conv2D(4 , kernel_size=(3, 3), padding="same", kernel_initializer=tf.random_normal_initializer(stddev=0.01))(dec_9)
-    #final_output = sigmoid_activation()(final_output)
-
-
-    #model = models.Model(input_1,final_output)
+    
 
     return final_output
 

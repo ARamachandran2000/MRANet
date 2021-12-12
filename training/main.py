@@ -7,7 +7,6 @@ import time
 import cv2
 import numpy as np
 
-from MRA_Model import *
 
 ## Global variables ##
 KEEP_PROB = 0.8
@@ -223,7 +222,7 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
         print("[Epoch: {0}/{1} Loss: {2} Time: {3}]".format(epoch + 1, epochs, loss, time.time() - start_time))
         
-        if epoch % 1 == 0:
+        if epoch % 1 == 0: # Save model every epoch
             save_file = 'saved_models/model_latest.ckpt'
             saver = tf.train.Saver()
             saver.save(sess, save_file)
@@ -239,13 +238,13 @@ def run():
     '''
     # Load Data
     data_folder = '../dataset/'
-    image_paths = data_folder + 'Final_Images_Final/'
-    label_paths = data_folder + 'Final_Labels_Final_2/'
+    image_paths = data_folder + 'Images/'
+    label_paths = data_folder + 'Labels/'
 
     vgg_path = '../data/vgg/'
     maybe_download_pretrained_vgg('../data')
 
-    runs_dir = './runs_city'
+    runs_dir = '../runs'
 
     label_colors = {i: np.array(l.color) for i, l in enumerate(label_classes)}
     print("Labels = ",label_colors)
@@ -281,7 +280,7 @@ def run():
                  keep_prob, learning_rate)
         print("Done Training...")
 
-        ### Testing ###
+        ### Testing on Final Model after Training ###
         image_test, gt_test = load_data(image_paths, label_paths)
         save_inference_samples(runs_dir, image_test, gt_test, sess, img_shape, logits, keep_prob, input_1,
                                label_colors)

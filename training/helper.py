@@ -99,7 +99,7 @@ def gen_batches_fn(img_shape, image_paths, label_paths):
 
                 train_images.append(image)
                 gt_images.append(label_all)
-                #print(train_images[0].shape,gt_images[0].shape)
+                
 
             yield np.array(train_images), np.array(gt_images)
 
@@ -115,15 +115,14 @@ def gen_test_output(sess, logits, keep_prob, image_pl, image_test, gt_test, imag
         gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
 
         labels = sess.run([tf.argmax(tf.nn.softmax(logits), axis=-1)], {keep_prob: 1.0, image_pl: [image]})
-        #print("Labels_shape = ", labels[0].shape, len(labels),gt_image.shape)
+        
         labels = labels[0].reshape(image_shape[0], image_shape[1])
-        #print("Labels_shape = ", labels.shape)
+        
         labels_colored = np.zeros((128,128,4))
-        #print(labels_colored.shape)
+        
         for lab in label_colors:
             label_mask = labels == lab
-            #print(label_mask)
-            #print(*label_colors[lab])
+            
             labels_colored[label_mask] = np.array([*label_colors[lab],255])
 
         mask = scipy.misc.toimage(labels_colored, mode="RGBA")

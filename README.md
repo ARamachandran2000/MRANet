@@ -85,22 +85,30 @@ Semantic Segmentation of remotely sensed images for post disaster assessment
 
 ## Project Organization
 -------
-    ├── README.md          
-    ├── models
+    ├── README.md       
+    │   
+    ├── training                <- raining codes
     │   ├── main.py
     │   ├── helper.py
+    │   └── MRA_Model.py
+    ├── testing                 <- Testing codes
+    │   ├── main.py
+    │   ├── helper.py
+    │   └── MRA_Model.py
+    │
     ├── utils
     │   └── metrics.py
     │   ├── Augment_Data.py     <- Main data augmentation file
-    |   ├── cap_aug.py     <-   File for cut paste augmentation
-    ├── requirements.txt   <- The requirements file for reproducing the analysis environment,
-    │                         generated with `pip freeze > requirements.txt`
+    │   ├── cap_aug.py          <- File for cut paste augmentation
+    │
+    ├── requirements.txt        <- The requirements file for reproducing the analysis environment,
+    │                              generated with `pip freeze > requirements.txt`
     ├── saved_models                  
     │   ├── checkpoint
     │   ├── model_latest.ckpt.data-00000-of-00001
     │   ├── model_latest.ckpt.index
     │   └── model_latest.ckpt.meta
-    └── data                <- Source code for use in this project.
+    └── data
         ├── vgg
         │   ├── variables
         │   ├── make_dataset.py  <- Script to generate data

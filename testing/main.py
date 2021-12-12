@@ -6,6 +6,10 @@ import numpy as np
 import cv2
 import shutil
 import os
+import argparse
+
+
+from MRA_Model import *
 
 ## Global variables ##
 KEEP_PROB = 0.8
@@ -185,7 +189,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 
     return logits, train_op, cross_entropy_loss
 
-def pred():
+def pred(image_path):
     
     if os.path.exists('.temp'):
         shutil.rmtree('.temp')
@@ -194,7 +198,7 @@ def pred():
     os.mkdir('.temp/img_patches/')
     os.mkdir('.temp/runs/')
 
-    test_img_path = 'tests/test.png'
+    test_img_path = image_path
 
     count = 0
     image = cv2.imread(test_img_path)
@@ -276,4 +280,16 @@ def pred():
         shutil.rmtree('.temp')
 
 if __name__ == '__main__':
-    pred()
+    # Creating parser
+    my_parser = argparse.ArgumentParser(description='List the content of a folder')
+
+    my_parser.add_argument('Path',
+                       metavar='path',
+                       type=str,
+                       help='the path to list')
+
+    args = my_parser.parse_args()
+    image_path = args.Path
+
+    # Predict
+    pred(image_path)

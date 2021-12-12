@@ -7,6 +7,7 @@ import time
 import cv2
 import numpy as np
 
+from MRA_Model import *
 
 ## Global variables ##
 KEEP_PROB = 0.8

@@ -54,6 +54,11 @@ Semantic Segmentation of remotely sensed images for post disaster assessment
     │   ├── model_latest.ckpt.data-00000-of-00001
     │   ├── model_latest.ckpt.index
     │   └── model_latest.ckpt.meta
+    |── dataset                 
+    │   ├── Images
+    │   ├── Labels
+    │   ├── Labels_json
+    │   └── Labels_Generate.py
     └── data
         ├── vgg
         │   ├── variables
@@ -101,6 +106,11 @@ Categorical cross-entropy was used as the loss function
 <p align="center">
   <img src="assets/loss.png" width="350" height="100" title="loss">
 </p>
+
+## Dataset
+-------
+
+Please Download the Xview2 Earthquake disaster Dataset and save the Images and Labels_json in dataset. Create the groundtruth masks from the json file using Labels_Generate.py and save the labels in folder Labels.
 
 
 ### Setup

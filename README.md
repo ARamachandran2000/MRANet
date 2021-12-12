@@ -92,7 +92,7 @@ Semantic Segmentation of remotely sensed images for post disaster assessment
     ├── utils
     │   └── metrics.py
     │   ├── Augment_Data.py     <- Main data augmentation file
-    |   ├── cap_aug.py   <-   File for cut paste augmentation
+    |   ├── cap_aug.py     <-   File for cut paste augmentation
     ├── requirements.txt   <- The requirements file for reproducing the analysis environment,
     │                         generated with `pip freeze > requirements.txt`
     ├── saved_models                  

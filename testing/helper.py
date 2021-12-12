@@ -37,89 +37,25 @@ def load_data(image_paths):
     return image_files
 
 
-def gen_batches_fn(img_shape, image_paths, label_paths):
-    def get_batches_fn(batch_size):
-
-        image_files = glob(image_paths + '*.png')
-        label_files = glob(label_paths + '*.png')
-        print(image_files)
-
-        gt_images, train_images = [], []
-        for img in image_files:  # [0:79]
-            img_base = os.path.basename(img)
-            img_city = os.path.basename(os.path.dirname(img))
-            label_base = img_base
-            # Changing the last term in the training images to the label base because they have the same name up to that point.
-            label = label_paths + label_base
-
-            train_images.append(img)
-            gt_images.append(label)
-
-        train_image_paths, gt_image_paths = shuffle(train_images, gt_images)
-
-        for batch_i in range(0, len(train_image_paths), batch_size):
-
-            train_images, gt_images = [], []
-
-            for img, label in zip(train_image_paths[batch_i:batch_i + batch_size],
-                                  gt_image_paths[batch_i:batch_i + batch_size]):
-                # print(img, label)
-                image = scipy.misc.imresize(scipy.misc.imread(img), img_shape)
-                #cv2.imwrite("/content/inp.png",image)
-                gt_image = scipy.misc.imresize(scipy.misc.imread(label, mode='RGB'), img_shape)
-                #cv2.imwrite("/content/gt.png",gt_image)
-                label_bg = np.zeros([img_shape[0], img_shape[1]], dtype=bool)
-                # plt.imshow(image)
-                # plt.show()
-                # plt.imshow(gt_image)
-                # plt.show()
-                label_list = []
-                for l in label_classes[1:]:
-                    current_class = np.all(gt_image == np.array(l.color), axis=2)
-                    label_bg = current_class | label_bg
-                    label_list.append(current_class)
-                # plt.imshow(label_bg)
-                # plt.show()
-
-                # ~ changes 0 to 1 and 1 to 0 so we find everything else not considered a class and stack this
-                # onto the label_list.
-                label_bg = ~label_bg
-                # Now we stack labels depth wise. For example, 2 classes would result in a shape (256, 512, 3) where
-                # each depth slice (pixel) might look like [False, False, True] or [0, 0, 1].
-                label_all = np.dstack([label_bg, *label_list])
-
-                train_images.append(image)
-                gt_images.append(label_all)
-                #print(train_images[0].shape,gt_images[0].shape)
-
-            yield np.array(train_images), np.array(gt_images)
-
-    return get_batches_fn
-
-
 def gen_test_output(sess, logits, keep_prob, image_pl, image_test, image_shape, label_colors):
     for f in image_test:
         image_file = f
         print("image_file= ",image_file)
-        # gt_image_file = gt_test[0]
 
         image = scipy.misc.imresize(scipy.misc.imread(image_file), image_shape)
-        # gt_image = scipy.misc.imresize(scipy.misc.imread(gt_image_file), image_shape)
 
         labels = sess.run([tf.argmax(tf.nn.softmax(logits), axis=-1)], {keep_prob: 1.0, image_pl: [image]})
-        #print("Labels_shape = ", labels[0].shape, len(labels),gt_image.shape)
+
         labels = labels[0].reshape(image_shape[0], image_shape[1])
-        #print("Labels_shape = ", labels.shape)
+
         labels_colored = np.zeros((128,128,4))
-        #print(labels_colored.shape)
+
         for lab in label_colors:
             label_mask = labels == lab
-            #print(label_mask)
-            #print(*label_colors[lab])
-            labels_colored[label_mask] = np.array([*label_colors[lab],128])
+            labels_colored[label_mask] = np.array([*label_colors[lab],255])
 
         mask = scipy.misc.toimage(labels_colored, mode="RGBA")
-        #print(labels_colored.shape)
+
         cv2.imwrite("check.png",labels_colored)
         init_img = scipy.misc.toimage(image)
         init_img.paste(mask, box=None, mask=mask)
@@ -136,7 +72,7 @@ def save_inference_samples(runs_dir, image_test, sess, image_shape, logits, keep
     os.makedirs(output_dir)
 
     # Run NN on test images and save them to HD
-    print('Training Finished. Saving test images to: {}'.format(output_dir))
+    print('Saving test images to: {}'.format(output_dir))
     image_outputs = gen_test_output(sess, logits, keep_prob, input_image, image_test, image_shape,
                                     label_colors)
     for name, image in image_outputs:

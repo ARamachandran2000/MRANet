@@ -7,8 +7,6 @@ import cv2
 import shutil
 import os
 
-from MRA_Model import *
-
 ## Global variables ##
 KEEP_PROB = 0.8
 LEARNING_RATE = 1e-4
@@ -39,7 +37,6 @@ def sigmoid_activation():
 
 def create_model():
 
-    #input_1 = layers.Input(shape = (128,128,3))    # batch_input_shape=(4,128,128,3
     input_1 = tf.placeholder(tf.float32, [1, 128, 128, 3], name='input')
     
     enc_1 = layers.Conv2D(64,kernel_size=(3,3),padding="same",kernel_initializer = tf.random_normal_initializer(stddev=0.01))(input_1)
@@ -172,7 +169,7 @@ def optimize(nn_last_layer, correct_label, learning_rate, num_classes):
 
     # logits and labels are now 2D tensors where each row represents a pixel and each column a class
     logits = tf.reshape(nn_last_layer, (-1, num_classes))
-    print(logits.shape)
+
     correct_label = tf.reshape(correct_label, (-1, num_classes))
 
     # Computes softmax cross entropy between logits and labels
